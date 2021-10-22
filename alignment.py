@@ -24,8 +24,6 @@ def alignment_bu(sequence1, sequence2):
 
                 matrix[i][j] = min(pad1, pad2, pad_both)
 
-    print(str(matrix))
-
     return matrix[len_seq1][len_seq2]
 
 
