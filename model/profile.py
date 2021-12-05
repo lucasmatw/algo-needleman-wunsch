@@ -20,16 +20,16 @@ class Profile:
         self.__increase_elem_at(elem, idx)
 
     def get_match_score(self, score_matrix, elem_idx, seq_elem):
-        fractional_score_dict = self.get_fractional_at(elem_idx)
+        fractional_score_dict = self.__get_fractional_at(elem_idx)
         total_score = 0
         for elem in fractional_score_dict:
             elem_frac_occurrence = fractional_score_dict[elem]
             match_score = score_matrix.get_match_score(elem, seq_elem)
             total_score += match_score * elem_frac_occurrence
 
-        return total_score
+        return round(total_score, 2)
 
-    def get_fractional_at(self, elem_idx):
+    def __get_fractional_at(self, elem_idx):
         if elem_idx >= self.length:
             raise ValueError("Invalid index")
 
@@ -45,12 +45,16 @@ class Profile:
 
     def add_profile_gap(self, elem, elem_idx):
         self.__insert_gap(elem_idx)
-        self.__increase_elem_at(SequenceElem.GAP, elem_idx)
+        self.__increase_elem_at(SequenceElem.GAP, elem_idx, self.sequences)
         self.__increase_elem_at(elem, elem_idx)
+
+    def increase_sequences(self):
+        self.sequences += 1
 
     def __insert_gap(self, elem_idx):
         for count_list in self.elem_matrix_count.values():
             self.__insert_gap_in_list(count_list, elem_idx)
+        self.length += 1
 
     def __insert_gap_in_list(self, count_list, idx):
         count_list.insert(idx, 0)
@@ -62,8 +66,8 @@ class Profile:
             for k in self.elem_matrix_count:
                 self.elem_matrix_count[k] = self.elem_matrix_count[k] + ([0] * delta)
 
-    def __increase_elem_at(self, elem, idx):
-        self.elem_matrix_count[elem][idx] += 1
+    def __increase_elem_at(self, elem, idx, amount=1):
+        self.elem_matrix_count[elem][idx] += amount
 
     def __init_matrix(self):
         matrix = {}

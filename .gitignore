@@ -1,1 +1,5 @@
 .idea/
+__pycache__/alignment.cpython-38.pyc
+model/__pycache__/score_matrix.cpython-38.pyc
+__pycache__/**
+model/__pycache__/**
