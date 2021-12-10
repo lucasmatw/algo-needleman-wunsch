@@ -1,7 +1,7 @@
 from model.sequence import SequenceElem
 
-match_score = 1
-mismatch_score = 0
+match_score = 3
+mismatch_score = -2
 gap_score = -1
 
 
@@ -10,6 +10,10 @@ class ScoreMatrix:
         self.matrix = self.__build_score_matrix()
 
     def get_match_score(self, elem_a, elem_b):
+
+        if SequenceElem.GAP == elem_a or SequenceElem.GAP == elem_b:
+            return gap_score
+
         return self.matrix[self.__get_elems_score_key(elem_a, elem_b)]
 
     def get_gap_score(self):

@@ -35,7 +35,7 @@ class Profile:
 
         fractional_dict = {}
         for elem in self.elem_matrix_count:
-            fractional_result = self.elem_matrix_count[elem][elem_idx] / self.sequences
+            fractional_result = round(self.elem_matrix_count[elem][elem_idx] / self.sequences, 1)
             fractional_dict[elem] = fractional_result
 
         return fractional_dict

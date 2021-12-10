@@ -2,11 +2,14 @@ import enum
 
 from model.profile import Profile
 from model.sequence import SequenceParser
+import time
+
 
 gap = "_"
 
 
 def nw_profile(seq_a_str, seq_b_str, score_matrix):
+
     parser = SequenceParser()
     seq1 = parser.parse(seq_a_str)
     seq2 = parser.parse(seq_b_str)
@@ -15,33 +18,13 @@ def nw_profile(seq_a_str, seq_b_str, score_matrix):
     profile.add_sequence(seq1)
 
     result_matrix = alignment_profile(score_matrix, profile, seq2)
-    printm(result_matrix)
     profile, align_seq = traceback_profile(profile, seq2, result_matrix, score_matrix)
-    return profile, align_seq, result_matrix[-1][-1]
 
-
-def nw_profile_list(seq_list, score_matrix):
-    parser = SequenceParser()
-
-    profile = Profile(0)
-
-    align_seq = None
-    result_matrix = None
-
-    for seq_str in seq_list:
-        seq = parser.parse(seq_str)
-
-        result_matrix = alignment_profile(score_matrix, profile, seq)
-        profile, align_seq = traceback_profile(profile, seq, result_matrix, score_matrix)
-
-    return profile, align_seq, result_matrix[-1][-1]
+    return NwResult(profile, align_seq, result_matrix[-1][-1])
 
 
 def nw_list(seq_list, score_matrix):
 
-    for seq in seq_list:
-        print(seq)
-
     profile = Profile(0)
 
     align_seq = None
@@ -51,7 +34,7 @@ def nw_list(seq_list, score_matrix):
         result_matrix = alignment_profile(score_matrix, profile, seq)
         profile, align_seq = traceback_profile(profile, seq, result_matrix, score_matrix)
 
-    return profile, align_seq, result_matrix[-1][-1]
+    return NwResult(profile, align_seq, result_matrix[-1][-1])
 
 
 def alignment_profile(score_matrix, profile, sequence):
@@ -65,10 +48,10 @@ def alignment_profile(score_matrix, profile, sequence):
     for i in range(1, len_profile + 1):
         for j in range(1, len_seq + 1):
             prev_score = matrix[i - 1][j - 1]
-            ma_mm_score = profile.get_match_score(score_matrix, i - 1, sequence.get(j - 1))
+            ma_mm_score = round(profile.get_match_score(score_matrix, i - 1, sequence.get(j - 1)), 1)
 
-            gap_a = matrix[i - 1][j] + gap_score
-            gap_b = matrix[i][j - 1] + gap_score
+            gap_a = round(matrix[i - 1][j] + gap_score, 1)
+            gap_b = round(matrix[i][j - 1] + gap_score, 1)
 
             matrix[i][j] = max(gap_a, gap_b, prev_score + ma_mm_score)
 
@@ -112,10 +95,9 @@ def traceback_profile(profile, sequence, result_matrix, score_matrix):
             ma_mm_score = profile.get_match_score(score_matrix, idx_a - 1, sequence.get(idx_b - 1))
             origin = get_origin(result_matrix, ma_mm_score, idx_a, idx_b)
 
-            print(str(origin))
             if origin == Origin.UP:
                 align_seq = insert_gap(align_seq, idx_b)
-                profile.add_sequence_gap(idx_b - 1)
+                profile.add_sequence_gap(idx_a - 1)
                 idx_a -= 1  # check ok
 
             if origin == Origin.LEFT:
@@ -165,3 +147,10 @@ class Origin(enum.Enum):
     UP = 0
     LEFT = 1
     DIAG = 2
+
+
+class NwResult:
+    def __init__(self, profile, aligned_seq, score):
+        self.profile = profile
+        self.aligned_sequence = aligned_seq
+        self.score = score
